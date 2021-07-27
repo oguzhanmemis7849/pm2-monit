@@ -1,0 +1,228 @@
+const pm2 = require('pm2');
+const { response } = require('express');
+
+const express = require('express');
+const router = express.Router();
+const app = express();
+const fs = require('fs');
+let processInfo = []
+const WebSocket = require('ws');
+const INTERVAL_TIME = 1000
+const wss = new WebSocket.Server({ port: 8080 });
+
+const getPm2Info =async  () =>
+{
+pm2.list((_err, list) => {
+    let a= list.map(item => {
+      return {
+        name: item.name,
+        pid: item.pid,
+        username: item.pm2_env.username,
+        user_domain: item.pm2_env.userDomain,
+        unique_id: item.pm2_env.unique_id,
+        status: item.pm2_env.status,
+        pm_uptime: getTimeAsFormat(item.pm2_env.pm_uptime),
+        created_at: new Date(item.pm2_env.created_at),
+        pm_id: item.pm2_env.pm_id,
+        restart_time: item.pm2_env.restart_time,
+        unstable_restarts: item.pm2_env.unstable_restarts,
+        version: item.pm2_env.version,
+        node_version: item.pm2_env.node_version,
+        memory_usage: Math.round(item.monit.memory / (1024 * 1024)) + " mb",
+        cpu_usage: "%" + item.monit.cpu,
+        pm_out_log_path: item.pm2_env.pm_out_log_path,
+        pm_err_log_path: item.pm2_env.pm_err_log_path,
+        computer_name:item.pm2_env.COMPUTERNAME
+
+      }
+    });
+    processInfo = a
+  })
+}
+wss.on('connection', function connection(ws) {
+console.log("connected");
+ setInterval(() => {
+   getPm2Info()
+   ws.send(JSON.stringify(processInfo))
+ }, INTERVAL_TIME);  
+});  
+
+
+function startStop(res) {
+  return (_err, proc) => {
+    let c = proc.map(item => {
+      return {
+        status: item.pm2_env.status
+      };
+    });
+    res.send(c);
+    console.log(c);
+  };
+}
+
+const getTimeAsFormat = (uptime) => {
+  let created_time = new Date(uptime); // oluşturulma zamanı - epoch time convert
+
+  let _uptime = (new Date() - created_time) / 1000; // çalışma zamanı(saniye) - epoch time convert
+
+  let dayTime = _uptime / 3600 / 24;
+  let hourTime = (_uptime / 3600) % 24;
+  let minuteTime = ((_uptime % 3600) / 60) % 24;
+  let secondTime = _uptime % 60;
+
+  let time = "";
+
+  time += Math.floor(dayTime) ? Math.floor(dayTime) + 'D ' : ""
+  time += Math.floor(hourTime) ? Math.floor(hourTime) + 'H ' : ""
+  time += Math.floor(minuteTime) ? Math.floor(minuteTime) + 'm ' : ""
+  time += Math.floor(secondTime) ? Math.floor(secondTime) + 's' : ""
+  return time
+}
+
+/* Home Pagee*/
+router.get('/', function (_req, res, _next) {
+    res.render('index', { title: 'Express' });
+  });
+
+
+/* POST Start */
+router.post('/appstart', (req, res) => {
+  pm2.start({
+    script: req.body.script,
+    name: req.body.name,
+    args: req.body.args || ""
+  }, startStop(res))
+});
+
+/* POST Stop */
+router.post('/appstop', (req, res) => {
+  pm2.stop(req.body.name || req.body.id, startStop(res));
+});
+
+/* POST Restart */
+router.post('/apprestart', (req, res) => {
+  let rest = req.body.hasOwnProperty("id") ? req.body.id : req.body.hasOwnProperty("name") ? req.body.name : ""
+  rest == "" ? res.send("ID or Name not found.") : pm2.restart(rest, (err, proc) => {
+    let r = proc.map(item => {
+      return {
+        restart_count: item.restart_time      }
+    });
+    res.send(r);
+  });
+  });
+
+/* DELETE */
+router.delete('/appdelete/:id', (req, res) => {
+  console.log(req.body.id);
+  let del = req.params.hasOwnProperty("id") ? req.params.id : req.params.hasOwnProperty("name") ? req.params.name : ""
+  del === "" ? res.send("ID or Name Not Found") : pm2.delete(del, (err, proc) => {
+      proc ? res.send({ message: proc }) : res.send({ message: "App can not found." })
+    });
+});
+//---------------------------------------------------------------------------------------------------------------------------------
+  /* Errlog Launchbus Anlık oluşan hatalar(Realtime err/issues) */
+  let x = "No Error";
+  pm2.launchBus(function(err_, bus) {
+    if(err_){
+      throw(err_)
+    }
+    bus.on("log:err", function(data) {
+      x = data;
+      // console.log(data); 
+    });   
+  });
+
+  router.get('/realtimeerr', (req, res) =>{
+      res.send(x.process.name + "<br>" + x.data) //name ile hata yazdırma
+  });
+//------------------------------------------------------------------------------------------------------------------------------------
+  /* Outlog Launchbus*/
+  let t = "";
+  pm2.launchBus(function(err_, bus) {
+    if(err_){
+      throw(err_)
+    }
+    bus.on("log:out", function(data) {
+      t = data;
+      // console.log(data); 
+    });   
+  });
+
+  router.get('/realtimeout', (req, res) =>{
+    res.send(t.data) 
+});
+//---------------------------------------------------------------------------------------------------------------------------
+/* GET Errorlog page / pathdeki hataları oku */
+router.get('/geterrlog/:id', (req, res) => {
+  let str = "";
+  pm2.describe(req.params.id, (err, description) => {
+    try {
+      
+
+      fs.readFile(description[0].pm2_env.pm_err_log_path, function (hata, data) {
+        if (hata) {
+          throw (hata);
+        }
+        str = data.toString();
+
+        res.status(200).send(str.substring(str.length - 5000)); // last 2000 char
+
+      });
+    } catch (error) {
+      console.log(error);
+      res.send({ "error": error.toString() })
+    }
+  });
+});
+
+/* GET Outlog page */
+router.get('/getoutlog/:id', (req, res) => {
+  let str = '';
+  pm2.describe(req.params.id, (_err, description) => {
+    try {
+      fs.readFile(description[0].pm2_env.pm_out_log_path, function (hata, data) {
+        if (hata) {
+          throw (hata);
+        }
+        str = data.toString();
+        res.status(200).send(str);
+      });
+    } catch (error) {
+      console.log(error);
+      res.send({ "error": error.toString() })
+    }
+  });
+});
+
+/* GET pm2 list page */
+router.get('/getpm2list', (_req, res, _next) => {
+  pm2.list((_err, list) => {
+    let a = list.map(item => {
+      return {
+        name: item.name,
+        pid: item.pid,
+        username: item.pm2_env.username,
+        user_domain: item.pm2_env.userDomain,
+        unique_id: item.pm2_env.unique_id,
+        status: item.pm2_env.status,
+        pm_uptime: getTimeAsFormat(item.pm2_env.pm_uptime),
+        created_at: new Date(item.pm2_env.created_at),
+        pm_id: item.pm2_env.pm_id,
+        restart_time: item.pm2_env.restart_time,
+        unstable_restarts: item.pm2_env.unstable_restarts,
+        version: item.pm2_env.version,
+        node_version: item.pm2_env.node_version,
+        memory_usage: Math.round(item.monit.memory / (1024 * 1024)) + " mb",
+        cpu_usage: "%" + item.monit.cpu,
+        pm_out_log_path: item.pm2_env.pm_out_log_path,
+        pm_err_log_path: item.pm2_env.pm_err_log_path,
+        computer_name:item.pm2_env.COMPUTERNAME
+
+      }
+    });
+    res.status(200).send(a)
+  });
+});
+module.exports = router;
+
+

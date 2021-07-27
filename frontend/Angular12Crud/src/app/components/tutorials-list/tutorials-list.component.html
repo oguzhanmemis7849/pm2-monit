@@ -1,0 +1,108 @@
+<div class="col-md-18">
+  <table class="table" *ngIf="apps.length > 0">
+    <thead>
+      <tr>
+        <th scope="col">ID</th>
+        <th scope="col">Name</th>
+        <th scope="col">Status</th>
+        <th scope="col">CPU Usage</th>
+        <th scope="col">Memory Usage</th>
+        <th scope="col">Computer</th>
+        <th scope="col">Unique ID</th>
+        <th scope="col">Created at</th>
+        <th scope="col">Uptime</th>
+        <th scope="col">Restart Count</th>
+        <th scope="col"></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let item of apps">
+        <th scope="row">{{ item.pm_id }}</th>
+        <td>{{ item.name }}</td>
+        <td [ngClass]="item.status == 'online' ? 'green' : 'red'">
+          {{ item.status }}
+        </td>
+        <td>{{ item.cpu_usage }}</td>
+        <td>{{ item.memory_usage }}</td>
+        <td class ="singleLine">{{ item.computer_name }}</td>
+        <td class ="singleLine">{{ item.unique_id }}</td>
+        <td class ="singleLine">{{ item.created_at }}</td>
+        <td class ="singleLine"><b>{{ item.pm_uptime }}</b></td>
+        <td>{{ item.restart_time }}</td>
+        <td class="row">
+
+          <div class="col-md-4">
+            <button
+              class="btn btn-outline-warning btn-sm"
+              type="button"
+              (click)="appRestart(item.name)"
+              data-toggle="tooltip" data-placement="top" title="Restart">
+              <mat-icon aria-hidden="false"
+                >refresh</mat-icon>
+            </button>
+          </div>
+
+          <div class="col-md-4">
+            <button
+              class="btn btn-outline-secondary btn-sm"
+              type="button"
+              (click)="triggerModal(modalData); appOutlog(item.pm_id)"
+              data-toggle="tooltip" data-placement="top" title="Out Logs">
+            <mat-icon aria-hidden="false"
+                >text_snippet</mat-icon>
+              <ng-template #modalData let-modal>
+                <div class="modal-header">
+                  <h4 class="modal-title" id="modal-basic-title">
+                    Out Logs
+                  </h4>
+                  <button
+                    type="button"
+                    class="close"
+                    aria-label="Close"
+                    (click)="modal.dismiss('Cross click')"
+                  >
+                    <span aria-hidden="true">X</span>
+                  </button>
+                </div>
+                <div class="modal-body">
+                  <p>
+                    <strong
+                      >Lorem ipsum, dolor sit amet consectetur adipisicing elit. Eos, adipisci.
+                      <span class="text-primary">"Agatha Harkness"</span>
+                      profile?</strong
+                    >
+                  </p>
+
+                  <p>
+                    Lorem ipsum dolor sit amet consectetur adipisicing elit. Accusantium, tempora.
+                  </p>
+                </div>
+                <div class="modal-footer">
+                  <button
+                    type="button"
+                    class="btn btn-danger"
+                    (click)="modal.close('Save click')"
+                  >
+                    Close
+                  </button>
+                </div>
+              </ng-template>
+            </button>
+          </div>
+
+          <div class="col-md-4">
+            <button
+              class="btn btn-outline-danger btn-sm"
+              type="button"
+              (click)=" appDelete(item.pm_id)"
+              data-toggle="tooltip" data-placement="top" title="Delete">
+              <mat-icon aria-hidden="false"
+                >delete
+              </mat-icon>
+            </button>
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
