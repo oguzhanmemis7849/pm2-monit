@@ -17,6 +17,7 @@ export class TutorialsListComponent implements OnInit {
   title = '';
   apps: any[] = [];
   closeModal: string = '';
+  consoleLog :string[] =[];
 
   messageFromServer!: string;
   wsSubscription: Subscription;
@@ -31,14 +32,20 @@ export class TutorialsListComponent implements OnInit {
     this.wsSubscription = this.wsService
       .createObservableSocket('ws://localhost:8080')
       .subscribe(
-        (data) =>  this.apps = JSON.parse(data),
+        (data) => {
+          data = JSON.parse(data);
+
+          if (data.type == 'apps') {
+            this.apps = data.apps;}
+          else if (data.type == 'outlog')
+          this.consoleLog.push(data.data)
+        },
         (err) => console.log('err'),
         () => {}
       );
   }
 
-  ngOnInit(): void {
-  }
+  ngOnInit(): void {}
 
   triggerModal(content: any) {
     this.modalService
@@ -76,11 +83,11 @@ export class TutorialsListComponent implements OnInit {
     });
   }
 
-  appStop(name:string):void {
-    this.tutorialService.appStop({name : name}).subscribe((result =>{
+  appStop(name: string): void {
+    this.tutorialService.appStop({ name: name }).subscribe((result) => {
       console.log(result);
-      this.list()
-    }))
+      this.list();
+    });
   }
 
   appDelete(id: number): void {
@@ -92,11 +99,11 @@ export class TutorialsListComponent implements OnInit {
   }
 
   appOutlog(id: number): void {
-    console.log(id);
-    this.tutorialService.appOutlog({ id: id }).subscribe((result) => {
+    this.tutorialService.appOutlog({ id }).subscribe((result) => {
       console.log(result);
     });
-  }
+
+   }
 
   sendMessageToServer() {
     this.status = this.wsService.sendMessage('Hello from client');
@@ -109,6 +116,6 @@ export class TutorialsListComponent implements OnInit {
 
   ngOnDestroy() {
     this.closeSocket();
+    this.appOutlog(0)
   }
-
 }

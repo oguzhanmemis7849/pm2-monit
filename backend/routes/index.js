@@ -6,6 +6,9 @@ const router = express.Router();
 const app = express();
 const fs = require('fs');
 let processInfo = []
+let outLog = "";
+let currentAppId = null;
+let outLogControl = false
 const WebSocket = require('ws');
 const INTERVAL_TIME = 1000
 const wss = new WebSocket.Server({ port: 8080 });
@@ -41,9 +44,25 @@ pm2.list((_err, list) => {
 }
 wss.on('connection', function connection(ws) {
 console.log("connected");
+
+pm2.launchBus(function(err_, bus) {
+  if(err_){
+    throw(err_)
+  }
+  bus.on("log:out", function(data) { 
+    if(outLogControl){ 
+      data["type"]="outlog"
+      if(data.process.pm_id == currentAppId){
+      ws.send(JSON.stringify(data));
+      }
+    }
+    // console.log(data); 
+  });   
+});
+
  setInterval(() => {
-   getPm2Info()
-   ws.send(JSON.stringify(processInfo))
+   getPm2Info()  
+   ws.send(JSON.stringify({type:"apps",apps:processInfo}))
  }, INTERVAL_TIME);  
 });  
 
@@ -133,23 +152,24 @@ router.delete('/appdelete/:id', (req, res) => {
   });
 
   router.get('/realtimeerr', (req, res) =>{
+    outLogControl = true
       res.send(x.process.name + "<br>" + x.data) //name ile hata yazdırma
   });
 //------------------------------------------------------------------------------------------------------------------------------------
   /* Outlog Launchbus*/
-  let t = "";
+ 
   pm2.launchBus(function(err_, bus) {
     if(err_){
       throw(err_)
     }
-    bus.on("log:out", function(data) {
-      t = data;
+    bus.on("log:out", function(data) { 
+      outLog = data;
       // console.log(data); 
     });   
   });
 
   router.get('/realtimeout', (req, res) =>{
-    res.send(t.data) 
+    res.send(outLog.data) 
 });
 //---------------------------------------------------------------------------------------------------------------------------
 /* GET Errorlog page / pathdeki hataları oku */
@@ -176,22 +196,27 @@ router.get('/geterrlog/:id', (req, res) => {
 });
 
 /* GET Outlog page */
-router.get('/getoutlog/:id', (req, res) => {
-  let str = '';
-  pm2.describe(req.params.id, (_err, description) => {
-    try {
-      fs.readFile(description[0].pm2_env.pm_out_log_path, function (hata, data) {
-        if (hata) {
-          throw (hata);
-        }
-        str = data.toString();
-        res.status(200).send(str);
-      });
-    } catch (error) {
-      console.log(error);
-      res.send({ "error": error.toString() })
-    }
-  });
+router.get('/getoutlog/:id', (req, res) => { 
+  let id = req.params.id;
+  currentAppId = id;
+  outLogControl = !outLogControl
+  console.log(outLogControl);
+  res.send({ outLogControl })
+
+  // pm2.describe(req.params.id, (_err, description) => {
+  //   try {
+  //     fs.readFile(description[0].pm2_env.pm_out_log_path, function (hata, data) {
+  //       if (hata) {
+  //         throw (hata);
+  //       }
+  //       str = data.toString(); 
+  //       res.status(200).send(str);
+  //     });
+  //   } catch (error) {
+  //     console.log(error);
+  //     res.send({ "error": error.toString() })
+  //   }
+  // });
 });
 
 /* GET pm2 list page */
@@ -224,5 +249,4 @@ router.get('/getpm2list', (_req, res, _next) => {
   });
 });
 module.exports = router;
-
 

@@ -2,6 +2,8 @@ import { Component } from '@angular/core';
 // import { Subscription } from 'rxjs';
 import { WebsocketService } from './services/websocket.service';
 
+
+
 @Component({
   selector: 'app-root',
   providers: [WebsocketService],
@@ -10,7 +12,11 @@ import { WebsocketService } from './services/websocket.service';
 })
 export class AppComponent {
   title = 'Angular12Crud';
-  // messageFromServer!: string;
+
+}
+
+
+// messageFromServer!: string;
   // wsSubscription: Subscription;
   // status: string = '';
 
@@ -39,4 +45,3 @@ export class AppComponent {
   // ngOnDestroy() {
   //   this.closeSocket();
   // }
-}

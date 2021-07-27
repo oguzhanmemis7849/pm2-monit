@@ -6,36 +6,34 @@ import { Tutorial } from '../models/tutorial.model';
 const baseUrl = '/api';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class TutorialService {
-
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {}
 
   getAll(): Observable<Tutorial[]> {
     return this.http.get<Tutorial[]>(baseUrl);
   }
 
-  getPm2List():Observable<any> {
+  getPm2List(): Observable<any> {
     return this.http.get(baseUrl + '/getpm2list');
   }
 
-  appRestart(data:any):Observable<any> {
-    return this.http.post(baseUrl + '/apprestart', data)
+  appRestart(data: any): Observable<any> {
+    return this.http.post(baseUrl + '/apprestart', data);
   }
 
-  appStop(data:any):Observable<any> {
+  appStop(data: any): Observable<any> {
     return this.http.post(baseUrl + '/appstop', data);
   }
 
-  appDelete(data:any):Observable<any> {
-    return this.http.delete(baseUrl + '/appdelete/'+ data.id);
+  appDelete(data: any): Observable<any> {
+    return this.http.delete(baseUrl + '/appdelete/' + data.id);
   }
 
-  appOutlog(data:any): Observable<any> {
-    return this.http.get(baseUrl + '/getoutlog/:id' + data.id);
+  appOutlog(data: any): Observable<any> {
+    return this.http.get(baseUrl + '/getoutlog/' + data.id);
   }
-
 
   create(data: any): Observable<any> {
     return this.http.post(baseUrl, data);
