@@ -17,7 +17,8 @@ export class TutorialsListComponent implements OnInit {
   title = '';
   apps: any[] = [];
   closeModal: string = '';
-  consoleLog :string[] =[];
+  consoleLog: any[] = [];
+  consoleErr: any[] = [];
 
   messageFromServer!: string;
   wsSubscription: Subscription;
@@ -36,9 +37,14 @@ export class TutorialsListComponent implements OnInit {
           data = JSON.parse(data);
 
           if (data.type == 'apps') {
-            this.apps = data.apps;}
-          else if (data.type == 'outlog')
-          this.consoleLog.push(data.data)
+            this.apps = data.apps;
+          }
+          else if (data.type == 'outlog'){
+          this.consoleLog.push({data : data.data, time:new Date(data.at).toString().split(" ").slice(1,5).join(" ") })
+          }
+          else if (data.type == 'errlog'){
+          this.consoleErr.push({data : data.data, time:new Date(data.at).toString().split(" ").slice(1,5).join(" ") })
+          }
         },
         (err) => console.log('err'),
         () => {}
@@ -90,6 +96,12 @@ export class TutorialsListComponent implements OnInit {
     });
   }
 
+  appStart(name: string): void{
+    this.tutorialService.appStart({name}).subscribe((result) => {
+      console.log(result);
+    });
+  }
+
   appDelete(id: number): void {
     console.log(id);
     this.tutorialService.appDelete({ id: id }).subscribe((result) => {
@@ -98,11 +110,28 @@ export class TutorialsListComponent implements OnInit {
     });
   }
 
-  appOutlog(id: number): void {
-    this.tutorialService.appOutlog({ id }).subscribe((result) => {
+  appOutlogTrue(id: number): void {
+    this.tutorialService.appOutlogTrue({ id }).subscribe((result) => {
       console.log(result);
     });
+   }
 
+   appOutlogFalse(id: number): void {
+    this.tutorialService.appOutlogFalse({ id }).subscribe((result) => {
+      console.log(result);
+    });
+   }
+
+   appErrLogTrue(id: number): void {
+    this.tutorialService.appErrlogTrue({ id }).subscribe((result) => {
+     console.log(result);
+    });
+  }
+
+   appErrLogFalse(id: number): void {
+     this.tutorialService.appErrlogFalse({ id }).subscribe((result) => {
+      console.log(result);
+     });
    }
 
   sendMessageToServer() {
@@ -116,6 +145,5 @@ export class TutorialsListComponent implements OnInit {
 
   ngOnDestroy() {
     this.closeSocket();
-    this.appOutlog(0)
   }
 }

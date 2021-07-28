@@ -32,7 +32,7 @@
         </td>
         <td>{{ item.restart_time }}</td>
         <td class="row">
-          <div class="col-md-4">
+          <div class="col-md-3">
             <button
               class="btn btn-outline-warning btn-sm"
               type="button"
@@ -45,43 +45,45 @@
             </button>
           </div>
 
-          <div class="col-md-4">
+          <div class="col-md-3">
             <button
               class="btn btn-outline-secondary btn-sm"
               type="button"
-              (click)="triggerModal(modalData); appOutlog(item.pm_id);  consoleLog=[]"
+              (click)="triggerModal(modalDataOut); appOutlogTrue(item.pm_id);  consoleLog=[]"
               data-toggle="tooltip"
               data-placement="top"
               title="Out Logs"
             >
               <mat-icon aria-hidden="false">text_snippet</mat-icon>
-              <ng-template #modalData let-modal>
+              <ng-template #modalDataOut let-modal>
                 <div class="modal-header">
-                  <h4 class="modal-title" id="modal-basic-title">Out Logs</h4>
+                  <strong>
+                    <p class="modal-title" id="modal-basic-title">Out Logs</p>
+                  </strong>
                   <button
                     type="button"
                     class="close"
                     aria-label="Close"
-                    (click)="modal.dismiss('Cross click'); appOutlog(0);"
+                    (click)="modal.dismiss('Cross click'); appOutlogFalse(item.pm_id);"
                   >
                     <span aria-hidden="true">X</span>
                   </button>
                 </div>
                 <div class="modal-body" style="overflow-y: scroll; max-height: 50vh; min-height: 50vh;">
-                  <p>
-                    <strong
-                      >
-                      <span><p *ngFor = "let item of consoleLog">{{item}}</p></span>
-                      </strong
-                    >
+                  <p *ngIf = "consoleLog.length > 0">
+
+                      <span><p *ngFor = "let item of consoleLog">{{item.time}} : {{item.data}}</p></span>
+
                   </p>
+
+                  <p *ngIf = "consoleLog.length == 0">No logs yet.</p>
 
                 </div>
                 <div class="modal-footer">
                   <button
                     type="button"
                     class="btn btn-danger"
-                    (click)="modal.close('Save click'); appOutlog(0);"
+                    (click)="modal.close('Save click'); appOutlogFalse(item.pm_id);"
                   >
                     Close
                   </button>
@@ -97,7 +99,61 @@
             </button>
           </div>
 
-          <div class="col-md-4">
+          <div class="col-md-3">
+            <button
+              class="btn btn-outline-secondary btn-sm"
+              type="button"
+              (click)="triggerModal(modalDataError); appErrLogTrue(item.pm_id);  consoleErr=[]"
+              data-toggle="tooltip"
+              data-placement="top"
+              title="Issues"
+            >
+              <mat-icon aria-hidden="false">sd_card_alert</mat-icon>
+              <ng-template #modalDataError let-modal>
+                <div class="modal-header">
+                  <h4 class="modal-title" id="modal-basic-title">Issues</h4>
+                  <button
+                    type="button"
+                    class="close"
+                    aria-label="Close"
+                    (click)="modal.dismiss('Cross click'); appErrLogFalse(item.pm_id);"
+                  >
+                    <span aria-hidden="true">X</span>
+                  </button>
+                </div>
+                <div class="modal-body" style="overflow-y: scroll; max-height: 50vh; min-height: 50vh;">
+                  <p *ngIf = "consoleErr.length > 0 ">
+                    <strong
+                      >
+                      <span><p *ngFor = "let item of consoleErr">{{item.time}} : {{item.data}}</p></span>
+                      </strong
+                    >
+                  </p>
+
+                  <p *ngIf = "consoleErr.length == 0 ">Error not found.</p>
+
+                </div>
+                <div class="modal-footer">
+                  <button
+                    type="button"
+                    class="btn btn-danger"
+                    (click)="modal.close('Save click'); appErrLogFalse(item.pm_id);"
+                  >
+                    Close
+                  </button>
+                  <button
+                  type="button"
+                  class="btn btn-primary"
+                  (click)="consoleErr=[]"
+                >
+                  Clear
+                </button>
+                </div>
+              </ng-template>
+            </button>
+          </div>
+
+          <div class="col-md-3">
             <button
               class="btn btn-outline-danger btn-sm"
               type="button"

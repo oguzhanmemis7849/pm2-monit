@@ -1,7 +1,7 @@
-const x = 0
+let x = 0
 setInterval(()=>{
     x++;
-    console.log("Deneme", x)
+    console.error("Deneme", x)
         if ( x == 3 ) {
             x = "235"
         } 

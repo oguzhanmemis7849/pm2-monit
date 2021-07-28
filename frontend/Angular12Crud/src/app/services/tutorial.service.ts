@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Tutorial } from '../models/tutorial.model';
+import { observableToBeFn } from 'rxjs/internal/testing/TestScheduler';
 
 const baseUrl = '/api';
 
@@ -27,12 +28,28 @@ export class TutorialService {
     return this.http.post(baseUrl + '/appstop', data);
   }
 
+  appStart(data: any): Observable<any> {
+    return this.http.post(baseUrl + '/appstart', data)
+  }
+
   appDelete(data: any): Observable<any> {
     return this.http.delete(baseUrl + '/appdelete/' + data.id);
   }
 
-  appOutlog(data: any): Observable<any> {
-    return this.http.get(baseUrl + '/getoutlog/' + data.id);
+  appOutlogTrue(data: any): Observable<any> {
+    return this.http.get(baseUrl + '/getoutlogTrue/' + data.id);
+  }
+
+  appOutlogFalse(data: any): Observable<any> {
+    return this.http.get(baseUrl + '/getoutlogFalse/' + data.id)
+  }
+
+  appErrlogTrue(data: any): Observable<any> {
+    return this.http.get(baseUrl + '/geterrLogTrue/' + data.id)
+  }
+
+  appErrlogFalse(data: any): Observable<any> {
+    return this.http.get(baseUrl + '/geterrLogFalse/' + data.id)
   }
 
   create(data: any): Observable<any> {

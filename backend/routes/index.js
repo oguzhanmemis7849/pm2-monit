@@ -7,8 +7,10 @@ const app = express();
 const fs = require('fs');
 let processInfo = []
 let outLog = "";
+let errLog = [];
 let currentAppId = null;
-let outLogControl = false
+let outLogControl = false;
+let errLogControl = false;
 const WebSocket = require('ws');
 const INTERVAL_TIME = 1000
 const wss = new WebSocket.Server({ port: 8080 });
@@ -53,12 +55,27 @@ pm2.launchBus(function(err_, bus) {
     if(outLogControl){ 
       data["type"]="outlog"
       if(data.process.pm_id == currentAppId){
-      ws.send(JSON.stringify(data));
+        ws.send(JSON.stringify(data));
       }
     }
     // console.log(data); 
   });   
 });
+
+  pm2.launchBus(function(err_, bus) {
+    if(err_){
+      throw(err_)
+    }
+    bus.on("log:err", function(data) {
+      if(errLogControl){
+        data["type"]="errlog" 
+        if(data.process.pm_id == currentAppId){
+          ws.send(JSON.stringify(data));
+        }
+      }
+      // console.log(data); 
+    });   
+  });
 
  setInterval(() => {
    getPm2Info()  
@@ -140,20 +157,19 @@ router.delete('/appdelete/:id', (req, res) => {
 });
 //---------------------------------------------------------------------------------------------------------------------------------
   /* Errlog Launchbus Anlık oluşan hatalar(Realtime err/issues) */
-  let x = "No Error";
+  
   pm2.launchBus(function(err_, bus) {
     if(err_){
       throw(err_)
     }
     bus.on("log:err", function(data) {
-      x = data;
-      // console.log(data); 
+      errLog.push({id : data.process.pm_id, data : data.data}) 
     });   
   });
 
   router.get('/realtimeerr', (req, res) =>{
-    outLogControl = true
-      res.send(x.process.name + "<br>" + x.data) //name ile hata yazdırma
+      errLogControl = true;
+      res.send(JSON.stringify(errLog)) //name ile hata yazdırma
   });
 //------------------------------------------------------------------------------------------------------------------------------------
   /* Outlog Launchbus*/
@@ -169,39 +185,69 @@ router.delete('/appdelete/:id', (req, res) => {
   });
 
   router.get('/realtimeout', (req, res) =>{
-    res.send(outLog.data) 
+    outLogControl = true;
+    res.send(outLog.data);
 });
 //---------------------------------------------------------------------------------------------------------------------------
 /* GET Errorlog page / pathdeki hataları oku */
-router.get('/geterrlog/:id', (req, res) => {
-  let str = "";
-  pm2.describe(req.params.id, (err, description) => {
-    try {
-      
-
-      fs.readFile(description[0].pm2_env.pm_err_log_path, function (hata, data) {
-        if (hata) {
-          throw (hata);
-        }
-        str = data.toString();
-
-        res.status(200).send(str.substring(str.length - 5000)); // last 2000 char
-
-      });
-    } catch (error) {
-      console.log(error);
-      res.send({ "error": error.toString() })
-    }
-  });
-});
-
-/* GET Outlog page */
-router.get('/getoutlog/:id', (req, res) => { 
+router.get('/geterrLogFalse/:id', (req, res) => { 
   let id = req.params.id;
   currentAppId = id;
-  outLogControl = !outLogControl
+  errLogControl = false;
+  console.log(errLogControl);
+  res.send({ errLogControl })
+});
+
+router.get('/geterrLogTrue/:id', (req, res) => { 
+  let id = req.params.id;
+  currentAppId = id;
+  errLogControl = true;
+  console.log(errLogControl);
+  res.send({ errLogControl })
+});
+
+// router.get('/geterrlog/:id', (req, res) => {
+//   let str = "";
+//   pm2.describe(req.params.id, (err, description) => {
+//     try {
+      
+
+//       fs.readFile(description[0].pm2_env.pm_err_log_path, function (hata, data) {
+//         if (hata) {
+//           throw (hata);
+//         }
+//         str = data.toString();
+
+//         res.status(200).send(str.substring(str.length - 5000)); // last 2000 char
+
+//       });
+//     } catch (error) {
+//       console.log(error);
+//       res.send({ "error": error.toString() })
+//     }
+//   });
+// });
+
+/*--------------------------------------------------------------------------------------------------------- */
+
+
+/* GET Outlog page */
+router.get('/getoutlogFalse/:id', (req, res) => { 
+  let id = req.params.id;
+  currentAppId = id;
+  outLogControl = false;
   console.log(outLogControl);
   res.send({ outLogControl })
+});
+
+router.get('/getoutlogTrue/:id', (req, res) => { 
+  let id = req.params.id;
+  currentAppId = id;
+  outLogControl = true;
+  console.log(outLogControl);
+  res.send({ outLogControl })
+
+  
 
   // pm2.describe(req.params.id, (_err, description) => {
   //   try {
