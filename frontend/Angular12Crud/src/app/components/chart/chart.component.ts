@@ -17,14 +17,14 @@ export class ChartComponent {
       plotShadow: false,
     },
     title: {
-      text: 'Air Composition',
+      text: "Test",
       y:225
     },
   legend:{
     enabled:false
   },
     tooltip: {
-      pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+      pointFormat: '{series.name}: <b>{{ item.cpu_usage }}</b>'
     },
     plotOptions: {
       pie: {
