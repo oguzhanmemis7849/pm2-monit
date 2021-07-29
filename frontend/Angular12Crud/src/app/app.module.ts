@@ -33,7 +33,8 @@ import { HighchartsChartModule } from 'highcharts-angular';
     MatIconModule,
     BrowserAnimationsModule,
     NgbModule,
-    HighchartsChartModule
+    HighchartsChartModule,
+
 
   ],
   providers: [],

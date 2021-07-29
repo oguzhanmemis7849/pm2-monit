@@ -3,10 +3,10 @@
 }
 
 .vertical-menu a {
-  background-color: #f5eeee; /* Grey background color */
+  background-color: #f8f9fa; /* Grey background color */
   color: black; /* Black text color */
   display: block; /* Make the links appear below each other */
-  padding: 12px; /* Add some padding */
+  padding: 10px; /* Add some padding */
   text-decoration: none; /* Remove underline from links */
 }
 
@@ -21,4 +21,16 @@
 
 .middle{
   text-align:center;
+}
+
+.frame{
+  border: 1px;
+  background-color: whitesmoke;
+  min-height: 80vh;
+  max-height: 80vh;
+  overflow-y: scroll ;
+}
+
+.active {
+  background:rgb(221, 221, 221);
 }
