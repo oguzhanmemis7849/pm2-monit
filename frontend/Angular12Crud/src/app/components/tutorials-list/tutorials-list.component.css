@@ -15,3 +15,7 @@
 .singleLine{
   white-space: nowrap;
 }
+
+.middle{
+  text-align:center;
+}

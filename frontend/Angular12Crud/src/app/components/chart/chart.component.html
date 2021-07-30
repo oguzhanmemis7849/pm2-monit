@@ -1,5 +1,24 @@
+<div class="row">
+<div class="vertical-menu col-md-3 ">
+  <a class="middle active">Processes</a>
+  <button
+    [class.active]="selectedId == item.pm_id"
+    class="middle btn btn-light btn-sm col-md-12"
+    *ngFor="let item of apps"
+    type="button"
+    data-toggle="tooltip"
+    data-placement="top"
+    (click) = "getChart(item.pm_id)"
+  >
+    <p>{{ item.name }}</p>
+  </button>
+  </div>
+
+<div class = "col-md-9">
 <highcharts-chart
    [Highcharts] = "highcharts"
    [options] = "chartOptions"
    style = "width: 100%; height: 400px; display: block;">
 </highcharts-chart>
+</div>
+</div>

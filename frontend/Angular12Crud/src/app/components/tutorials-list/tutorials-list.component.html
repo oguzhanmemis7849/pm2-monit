@@ -1,4 +1,6 @@
 <div class="col-md-12">
+  <h1 *ngIf='apps.length > 0' class = "middle"><strong>Active Processes</strong></h1>
+  <h1 *ngIf='apps.length == 0' class = "middle"><strong>No Active Processes Yet</strong>  </h1>
   <table class="table" *ngIf="apps.length > 0">
     <thead>
       <tr>

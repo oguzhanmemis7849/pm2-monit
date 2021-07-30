@@ -9,6 +9,7 @@ import { ChartComponent } from './components/chart/chart.component';
 
 const routes: Routes = [
   { path: '', redirectTo: 'tutorials', pathMatch: 'full' },
+  { path: '', component: TutorialsListComponent },
   { path: 'pm2list', component: TutorialsListComponent },
   { path: 'tutorials/:id', component: TutorialDetailsComponent },
   { path: 'issues', component: AddTutorialComponent },
