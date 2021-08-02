@@ -34,7 +34,7 @@ pm2.list((_err, list) => {
         version: item.pm2_env.version,
         node_version: item.pm2_env.node_version,
         memory_usage: Math.round(item.monit.memory / (1024 * 1024)) + " mb",
-        cpu_usage: "%" + item.monit.cpu,
+        cpu_usage: item.monit.cpu ,
         pm_out_log_path: item.pm2_env.pm_out_log_path,
         pm_err_log_path: item.pm2_env.pm_err_log_path,
         computer_name:item.pm2_env.COMPUTERNAME
@@ -285,7 +285,7 @@ router.get('/getpm2list', (_req, res, _next) => {
         version: item.pm2_env.version,
         node_version: item.pm2_env.node_version,
         memory_usage: Math.round(item.monit.memory / (1024 * 1024)) + " mb",
-        cpu_usage: "%" + item.monit.cpu,
+        cpu_usage:  Math.random(),
         pm_out_log_path: item.pm2_env.pm_out_log_path,
         pm_err_log_path: item.pm2_env.pm_err_log_path,
         computer_name:item.pm2_env.COMPUTERNAME
