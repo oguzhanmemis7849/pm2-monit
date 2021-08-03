@@ -20,7 +20,8 @@ export class ChartComponent {
   apps: any[] = [];
   updateFlag = false;
   show = false;
-  chartValues: any = {};
+  chartValuesCpu: any = {};
+  chartValuesMemory: any = [];
 
   messageFromServer!: string;
   wsSubscription: Subscription;
@@ -65,71 +66,29 @@ export class ChartComponent {
         name: 'Composition',
         colorByPoint: true,
         innerSize: '80%',
-        data: [
-          {
-            name: 'CPU',
-            color: '#009900',
-            y: 10,
-          },
-          {
-            name: 'Free',
-            color: '#d9d9d9',
-            y: 90,
-          },
-        ],
+        data: [],
       },
     ],
   };
 
   chartMemory: Highcharts.Options = {
-    chart: {
-      marginTop: 0,
-      // plotBackgroundColor: "white",
-      // plotBorderWidth: 1,
-      // plotShadow: false,
-      type: 'line',
-    },
     title: {
-      text: 'CPU Usage',
-      y: 140,
+      text: 'Memory Usage (mb/sec)',
     },
-    legend: {
-      enabled: false,
+    xAxis: {
+      title: {
+        text: 'seconds',
+      },
     },
-    tooltip: {
-      pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>',
-    },
-    plotOptions: {
-      pie: {
-        allowPointSelect: true,
-        cursor: 'pointer',
-        dataLabels: {
-          enabled: true,
-          formatter: function () {
-            return this.key + ': ' + this.y + '%';
-          },
-        },
-        showInLegend: true,
+    yAxis: {
+      title: {
+        text: 'Usage(mb)',
       },
     },
     series: [
       {
-        type: 'pie',
-        name: 'Composition',
-        colorByPoint: true,
-        innerSize: '80%',
-        data: [
-          {
-            name: 'CPU',
-            color: '#009900',
-            y: 10,
-          },
-          {
-            name: 'Free',
-            color: '#d9d9d9',
-            y: 90,
-          },
-        ],
+        data: [],
+        type: 'line',
       },
     ],
   };
@@ -150,10 +109,12 @@ export class ChartComponent {
               (item: any) => item.pm_id == this.selectedId
             );
 
-
-            this.chartValues['cpuUsage'] = this.app?.cpu_usage;
+            this.chartValuesCpu['cpuUsage'] = this.app?.cpu_usage;
+            if (this.app?.memory_usage)
+              this.chartValuesMemory.push(this.app?.memory_usage);
 
             this.updateChartCpu();
+            this.updateChartMemory();
           }
         },
         (err) => console.log('err'),
@@ -162,8 +123,16 @@ export class ChartComponent {
   }
 
   getChart(id: number): void {
-    this.selectedId = id;
+    this.show = true;
 
+    this.selectedId = id;
+    this.chartValuesMemory = [];
+    this.chartMemory.series = [
+      {
+        data: this.chartValuesMemory,
+        type: 'line',
+      },
+    ];
   }
 
   list(): void {
@@ -181,40 +150,54 @@ export class ChartComponent {
     this.closeSocket();
   }
 
-
   updateChartCpu() {
-
-    const self = this
+    const self = this;
 
     setTimeout(() => {
-      this.chartValues['cpuUsage'] = parseInt(this.app?.cpu_usage.toString().split('%').join(''))
-      console.log(this.chartValues['cpuUsage']);
-      if(!isNaN(this.chartValues['cpuUsage'])){
-      this.chartCPU.series = [
-        {
-          type: 'pie',
-          name: 'Composition',
-          colorByPoint: true,
-          innerSize: '80%',
-          data:[
-            {
-              name: 'CPU',
-              color: '#009900',
-              y: this.chartValues['cpuUsage'],
-            },
-            {
-              name: 'Free',
-              color: '#d9d9d9',
-              y: 100 - this.chartValues['cpuUsage'],
-            }
-          ]
-        }
-      ];
+      this.chartValuesCpu['cpuUsage'] = parseInt(
+        this.app?.cpu_usage.toString().split('%').join('')
+      );
+      if (!isNaN(this.chartValuesCpu['cpuUsage'])) {
+        this.chartCPU.series = [
+          {
+            type: 'pie',
+            name: 'Composition',
+            colorByPoint: true,
+            innerSize: '80%',
+            data: [
+              {
+                name: 'CPU',
+                color: '#009900',
+                y: this.chartValuesCpu['cpuUsage'],
+              },
+              {
+                name: 'Free',
+                color: '#d9d9d9',
+                y: 100 - this.chartValuesCpu['cpuUsage'],
+              },
+            ],
+          },
+        ];
 
+        self.updateFlag = true;
+      }
+    }, 1000);
+  }
 
-      self.updateFlag = true;
-      this.show=true;
-}
+  updateChartMemory() {
+    const self = this;
+    setTimeout(() => {
+      console.log(this.chartValuesMemory);
+      if (this.chartValuesMemory) {
+        this.chartMemory.series = [
+          {
+            data: this.chartValuesMemory,
+            type: 'line',
+          },
+        ];
+
+        self.updateFlag = true;
+      }
     }, 1000);
   }
 }

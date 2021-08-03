@@ -44,9 +44,6 @@ export class TutorialsListComponent implements OnInit {
           else if (data.type == 'outlog'){
           this.consoleLog.push({data : data.data, time:new Date(data.at).toString().split(" ").slice(1,5).join(" ") })
           }
-          else if (data.type == 'errlog'){
-          this.consoleErr.push({data : data.data, time:new Date(data.at).toString().split(" ").slice(1,5).join(" ") })
-          }
         },
         (err) => console.log('err'),
         () => {}
@@ -122,18 +119,6 @@ export class TutorialsListComponent implements OnInit {
     this.tutorialService.appOutlogFalse({ id }).subscribe((result) => {
       console.log(result);
     });
-   }
-
-   appErrLogTrue(id: number): void {
-    this.tutorialService.appErrlogTrue({ id }).subscribe((result) => {
-     console.log(result);
-    });
-  }
-
-   appErrLogFalse(id: number): void {
-     this.tutorialService.appErrlogFalse({ id }).subscribe((result) => {
-      console.log(result);
-     });
    }
 
   sendMessageToServer() {

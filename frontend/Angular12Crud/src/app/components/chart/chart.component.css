@@ -3,7 +3,7 @@
 }
 
 .vertical-menu a {
-  background-color: #f8f9fa; /* Grey background color */
+  background-color: #f8f9fa; /* Gray background color */
   color: black; /* Black text color */
   display: block; /* Make the links appear below each other */
   padding: 10px; /* Add some padding */
@@ -11,16 +11,16 @@
 }
 
 .vertical-menu a:hover {
-  background-color: #ccc; /* Dark grey background on mouse-over */
+  background-color: #ccc; /* Dark gray background on mouse-over */
 }
 
 .vertical-menu a.active {
-  background-color:#212529!important; /* Add a green color to the "active/current" link */
+  background-color:#212529!important;
   color: white;
 }
 
 .middle{
-  text-align:center;
+  text-align:center; /* Text is average */
 }
 
 .active {
