@@ -38,5 +38,14 @@ For the frontend, open a new terminal and enter the frontend file from the conso
 `npm install` 
 `npm run start` and go to the [http://localhost:4200/](http://localhost:4200/) 
 
+## Test
+This project uses mocha test framework.
+GET, POST, DELETE operations are tested.
+
+You can test with `npm test`. 
+
+![Test](https://github.com/oguzhanmemis7849/pm2-monit/blob/master/images/test.PNG)
+
+
 ### Creators
 Oğuzhan Memiş
