@@ -37,3 +37,6 @@ For the frontend, open a new terminal and enter the frontend file from the conso
 
 `npm install` 
 `npm run start` and go to the [http://localhost:4200/](http://localhost:4200/) 
+
+### Creators
+Oğuzhan Memiş
