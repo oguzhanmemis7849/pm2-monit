@@ -93,7 +93,6 @@ function startStop(res) {
       };
     });
     res.send(c);
-    console.log(c);
   };
 }
 
@@ -150,7 +149,6 @@ router.post('/apprestart', (req, res) => {
 
 /* DELETE */
 router.delete('/appdelete/:id', (req, res) => {
-  console.log(req.body.id);
   let del = req.params.hasOwnProperty("id") ? req.params.id : req.params.hasOwnProperty("name") ? req.params.name : ""
   del === "" ? res.send("ID or Name Not Found") : pm2.delete(del, (err, proc) => {
       proc ? res.send({ message: proc }) : res.send({ message: "App can not found." })
@@ -292,6 +290,7 @@ router.get('/getpm2list', (_req, res, _next) => {
 
       }
     });
+ 
     res.status(200).send(a)
   });
 });

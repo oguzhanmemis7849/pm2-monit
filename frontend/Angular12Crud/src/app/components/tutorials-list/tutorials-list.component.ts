@@ -30,7 +30,6 @@ export class TutorialsListComponent implements OnInit {
     private modalService: NgbModal,
     private wsService: WebsocketService
   ) {
-    let self = this;
 
     this.wsSubscription = this.wsService
       .createObservableSocket('ws://localhost:8080')
