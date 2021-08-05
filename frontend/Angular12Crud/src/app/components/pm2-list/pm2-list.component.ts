@@ -9,10 +9,10 @@ import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-tutorials-list',
-  templateUrl: './tutorials-list.component.html',
-  styleUrls: ['./tutorials-list.component.css'],
+  templateUrl: './pm2-list.component.html',
+  styleUrls: ['./pm2-list.component.css'],
 })
-export class TutorialsListComponent implements OnInit {
+export class Pm2ListComponent implements OnInit {
   tutorials?: Tutorial[];
   currentTutorial: Tutorial = {};
   currentIndex = -1;

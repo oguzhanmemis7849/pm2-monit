@@ -21,7 +21,7 @@ export class ChartComponent {
   updateFlag = false;
   show = false;
   chartValuesCpu: any = {};
-  chartValuesMemory: any = [];
+  chartValuesMemory: any = [] ;
 
   messageFromServer!: string;
   wsSubscription: Subscription;
@@ -63,7 +63,7 @@ export class ChartComponent {
     series: [
       {
         type: 'pie',
-        name: 'Composition',
+        name: 'Area',
         colorByPoint: true,
         innerSize: '80%',
         data: [],
@@ -87,6 +87,7 @@ export class ChartComponent {
     },
     series: [
       {
+        name: "",
         data: [],
         type: 'line',
       },
@@ -151,6 +152,7 @@ export class ChartComponent {
   }
 
   updateChartCpu() {
+
     const self = this;
 
     setTimeout(() => {
@@ -161,7 +163,7 @@ export class ChartComponent {
         this.chartCPU.series = [
           {
             type: 'pie',
-            name: 'Composition',
+            name: 'Area',
             colorByPoint: true,
             innerSize: '80%',
             data: [
@@ -185,12 +187,15 @@ export class ChartComponent {
   }
 
   updateChartMemory() {
+
     const self = this;
+
     setTimeout(() => {
       console.log(this.chartValuesMemory);
       if (this.chartValuesMemory) {
         this.chartMemory.series = [
           {
+            name: "Memory Usage (mb)",
             data: this.chartValuesMemory,
             type: 'line',
           },

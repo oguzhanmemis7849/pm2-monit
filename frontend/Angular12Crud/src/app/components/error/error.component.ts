@@ -9,10 +9,10 @@ declare var $: any;
 
 @Component({
   selector: 'app-add-tutorial',
-  templateUrl: './add-tutorial.component.html',
-  styleUrls: ['./add-tutorial.component.css']
+  templateUrl: './error.component.html',
+  styleUrls: ['./error.component.css']
 })
-export class AddTutorialComponent implements OnInit {
+export class ErrorComponent implements OnInit {
   tutorials?: Tutorial[];
   currentTutorial: Tutorial = {};
   currentIndex = -1;
