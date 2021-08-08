@@ -10,8 +10,8 @@ Real-time data flow is made with websocket between backend and frontend.
 The project has 3 pages. Overview, Issues and Charts.
 * Overview :
 
-Processes Id, Name, Status, CPU and Memory Usage, Computer name, Unique Id, Created at, Uptime and Restart Count 
-information are you can access.You can restart these processes with the restart button, check their output with the out logs button and 
+You can access Processes Id, Name, Status, CPU and Memory Usage, Computer name, Unique Id, Created at, Uptime and Restart Count 
+information. You can restart these processes with the restart button, check their output with the out logs button and 
 delete the processes with the delete button.
 
 * Issues : 
@@ -20,7 +20,7 @@ In this section, you can instantly see the errors by selecting the active proces
 
 * Charts :
 
-In this section, by selecting the active processes according to their names, you can monitor the CPU consumption and memory usage graphically instantly.
+In this section, by selecting the active processes according to their names, you can monitor the CPU consumption and memory usage graphically.
 
 ## Backend
 For the backend, open a new terminal and enter the backend file from the console as cd Backend.
